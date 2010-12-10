@@ -187,6 +187,10 @@ function <SID>CloseStackPop(char) " ---{{{2
 endf
 
 function <SID>QuoteDelim(char) " ---{{{2
+  if (exists('g:autoclose_vimfilemode') && a:char == '"')
+    iunmap "
+    return '"'
+  endif
   let line = getline('.')
   let col = col('.')
   if line[col - 2] == "\\"

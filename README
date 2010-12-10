@@ -6,4 +6,10 @@ Using this script, typing ``(`` will result in (|), where | is the cursor positi
 
 The paired characters are: [, (, {, ", '
 
+Note: in Vim files, you often do not want pairing of " because it is the comment character. You can use something like this to turn that pairing off in vim files:
+
+  if has("autocmd")
+    autocmd FileType vim let g:autoclose_vimfilemode = 1
+  endif
+
 If you like this script, you should also check out surround.vim
