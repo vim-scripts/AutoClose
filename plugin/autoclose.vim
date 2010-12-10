@@ -187,8 +187,8 @@ function <SID>CloseStackPop(char) " ---{{{2
 endf
 
 function <SID>QuoteDelim(char) " ---{{{2
-  if (exists('g:autoclose_vimfilemode') && a:char == '"')
-    iunmap "
+  " If this is a Vim file, and user has requested it, do not pair double-quote
+  if (a:char == '"' && exists('g:autoclose_vim_commentmode') && exists('b:current_syntax') && b:current_syntax == "vim")
     return '"'
   endif
   let line = getline('.')
