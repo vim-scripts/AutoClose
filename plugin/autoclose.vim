@@ -63,7 +63,7 @@ nmap <Plug>ToggleAutoCloseMappings :call <SID>ToggleAutoCloseMappings()<CR>
 if (!hasmapto( '<Plug>ToggleAutoCloseMappings', 'n' ))
     nmap <unique> <Leader>a <Plug>ToggleAutoCloseMappings
 endif
-fun <SID>ToggleAutoCloseMappings() " --- {{{2
+fun! <SID>ToggleAutoCloseMappings() " --- {{{2
     if g:autoclose_on
         iunmap "
         iunmap '
@@ -108,7 +108,7 @@ endf
 let s:closeStack = []
 
 " AutoClose Utilities -----------------------------------------{{{1
-function <SID>OpenSpecial(ochar,cchar) " ---{{{2
+function! <SID>OpenSpecial(ochar,cchar) " ---{{{2
     let line = getline('.')
     let col = col('.') - 2
     "echom string(col).':'.line[:(col)].'|'.line[(col+1):]
@@ -122,7 +122,7 @@ function <SID>OpenSpecial(ochar,cchar) " ---{{{2
     return a:ochar.<SID>CloseStackPush(a:cchar)
 endfunction
 
-function <SID>CloseStackPush(char) " ---{{{2
+function! <SID>CloseStackPush(char) " ---{{{2
     "echom "push"
     let line = getline('.')
     let col = col('.')-2
@@ -137,7 +137,7 @@ function <SID>CloseStackPush(char) " ---{{{2
     return ''
 endf
 
-function <SID>JumpOut(char) " ----------{{{2
+function! <SID>JumpOut(char) " ----------{{{2
     let column = col('.') - 1
     let line = getline('.')
     let mcol = match(line[column :], a:char)
@@ -156,7 +156,7 @@ function <SID>JumpOut(char) " ----------{{{2
         return a:char
     endif
 endf
-function <SID>CloseStackPop(char) " ---{{{2
+function! <SID>CloseStackPop(char) " ---{{{2
     "echom "pop"
     if(a:char == '')
         pclose
@@ -186,7 +186,7 @@ function <SID>CloseStackPop(char) " ---{{{2
     return popped
 endf
 
-function <SID>QuoteDelim(char) " ---{{{2
+function! <SID>QuoteDelim(char) " ---{{{2
   let line = getline('.')
   let col = col('.')
   if line[col - 2] == "\\"
@@ -203,11 +203,11 @@ endf
 
 " The strings returned from QuoteDelim aren't in scope for <SID>, so I
 " have to fake it using this function (from the Vim help, but tweaked)
-function s:SID()
+function! s:SID()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID$')
 endfun
 
-function <SID>OpenCloseBackspace() " ---{{{2
+function! <SID>OpenCloseBackspaceOrDel(map) " ---{{{2
     "if pumvisible()
     "    pclose
     "    call <SID>StopOmni()
