@@ -197,9 +197,6 @@ function <SID>QuoteDelim(char) " ---{{{2
     return '"'
   endif
 
-  if (a:char == '"' && exists('b:current_syntax') && b:current_syntax == 'vim' && match(line, '^\s*$'))
-    return '"'
-  endif
   if line[col - 2] == "\\"
     "Inserting a quoted quotation mark into the string
     return a:char
