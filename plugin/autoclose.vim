@@ -187,12 +187,19 @@ function <SID>CloseStackPop(char) " ---{{{2
 endf
 
 function <SID>QuoteDelim(char) " ---{{{2
-  " If this is a Vim file, and user has requested it, do not pair double-quote
-  if (a:char == '"' && exists("g:autoclose_vim_commentmode") && exists("b:current_syntax") && b:current_syntax == "vim")
-    return '"'
-  endif
   let line = getline('.')
   let col = col('.')
+
+  " In Vim syntax, double-quote is paired only if it's not the first thing
+  " on the line. This is for commenting use. It doesn't cover right-hand
+  " comments, but hey, you shouldn't use those anyway...
+  if (a:char == '"' && exists('b:current_syntax') && b:current_syntax ==# 'vim' && line =~ '^\s*$')
+    return '"'
+  endif
+
+  if (a:char == '"' && exists('b:current_syntax') && b:current_syntax == 'vim' && match(line, '^\s*$'))
+    return '"'
+  endif
   if line[col - 2] == "\\"
     "Inserting a quoted quotation mark into the string
     return a:char
