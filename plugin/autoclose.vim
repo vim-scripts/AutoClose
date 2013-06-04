@@ -189,6 +189,14 @@ endf
 function <SID>QuoteDelim(char) " ---{{{2
   let line = getline('.')
   let col = col('.')
+
+  " In Vim syntax, double-quote is paired only if it's not the first thing
+  " on the line. This is for commenting use. It doesn't cover right-hand
+  " comments, but hey, you shouldn't use those anyway...
+  if (a:char == '"' && exists('b:current_syntax') && b:current_syntax ==# 'vim' && line =~ '^\s*$')
+    return '"'
+  endif
+
   if line[col - 2] == "\\"
     "Inserting a quoted quotation mark into the string
     return a:char
