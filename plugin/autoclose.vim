@@ -1,12 +1,17 @@
 " File: autoclose.vim
 " Author: Karl Guertin <grayrest@gr.ayre.st>
-" Version: 1.2
-" Last Modified: June 18, 2009
+" Version: 1.3
+" Last Modified: May 9, 2015
 " Description: AutoClose, closes what's opened.
 "
 "    This plugin closes opened parenthesis, braces, brackets, quotes as you
-"    type them. As of 1.1, if you type the open brace twice ({{), the closing
+"    type them.
+"    As of 1.1, if you type the open brace twice ({{), the closing
 "    brace will be pushed down to a new line.
+"    As of version 1.3, that "{{" behaviour can be optionally disabled by
+"    putting this in your vimrc (possibly in an augroup to selectively
+"    disable or re-enable it for desired file types/extensions):
+"    let g:autoclose_openspecial = {0|1}.
 "
 "    You can enable or disable this plugin by typing \a (or <Leader>a if you
 "    changed your Leader char). You can define your own mapping and will need
@@ -23,6 +28,7 @@
 "          be sure to :set ttimeout and :set ttimeoutlen=100
 "
 "    Version Changes: --------------------------------------------------{{{2
+"    1.3   -- Made the "{{" behaviour optional.
 "    1.2   -- Fixed some edge cases where double the closing characters are
 "             entered when exiting insert mode.
 "             Finally (!) reproduced the arrow keys problem other people were
@@ -57,6 +63,10 @@ if !exists('g:autoclose_on')
     let g:autoclose_on = 1
 endif
 
+if !exists('g:autoclose_openspecial')
+    let g:autoclose_openspecial = 1
+endif
+
 " (Toggle) Mappings -----------------------------{{{1
 "
 nmap <Plug>ToggleAutoCloseMappings :call <SID>ToggleAutoCloseMappings()<CR>
@@ -85,8 +95,8 @@ fun <SID>ToggleAutoCloseMappings() " --- {{{2
         inoremap ) <C-R>=<SID>CloseStackPop(')')<CR>
         inoremap <silent> [ [<C-R>=<SID>CloseStackPush(']')<CR>
         inoremap <silent> ] <C-R>=<SID>CloseStackPop(']')<CR>
-        "inoremap <silent> { {<C-R>=<SID>CloseStackPush('}')<CR>
         inoremap <silent> { <C-R>=<SID>OpenSpecial('{','}')<CR>
+        "inoremap <silent> { {<C-R>=<SID>CloseStackPush('}')<CR>
         inoremap <silent> } <C-R>=<SID>CloseStackPop('}')<CR>
         inoremap <silent> <BS> <C-R>=<SID>OpenCloseBackspace()<CR>
         inoremap <silent> <C-h> <C-R>=<SID>OpenCloseBackspace()<CR>
@@ -109,15 +119,17 @@ let s:closeStack = []
 
 " AutoClose Utilities -----------------------------------------{{{1
 function <SID>OpenSpecial(ochar,cchar) " ---{{{2
-    let line = getline('.')
-    let col = col('.') - 2
-    "echom string(col).':'.line[:(col)].'|'.line[(col+1):]
-    if a:ochar == line[(col)] && a:cchar == line[(col+1)] "&& strlen(line) - (col) == 2
-        "echom string(s:closeStack)
-        while len(s:closeStack) > 0
-            call remove(s:closeStack, 0)
-        endwhile
-        return "\<esc>a\<CR>;\<CR>".a:cchar."\<esc>\"_xk$\"_xa"
+    if g:autoclose_openspecial
+        let line = getline('.')
+        let col = col('.') - 2
+        "echom string(col).':'.line[:(col)].'|'.line[(col+1):]
+        if a:ochar == line[(col)] && a:cchar == line[(col+1)] "&& strlen(line) - (col) == 2
+            "echom string(s:closeStack)
+            while len(s:closeStack) > 0
+                call remove(s:closeStack, 0)
+            endwhile
+            return "\<esc>a\<CR>;\<CR>".a:cchar."\<esc>\"_xk$\"_xa"
+        endif
     endif
     return a:ochar.<SID>CloseStackPush(a:cchar)
 endfunction
